@@ -1,0 +1,15 @@
+import { createTodo } from "./create-todo";
+
+let element;
+/**
+ *
+ * @param {String} elementId
+ * @param {Todo} todos
+ */
+export const renderTodos = (elementId, todos = []) => {
+  if (!element) element = document.querySelector(elementId);
+  if (!element) throw new Error(`Element ${elementId} not found`);
+  todos.forEach((todo) => {
+    element.append(createTodo(todo));
+  });
+};
