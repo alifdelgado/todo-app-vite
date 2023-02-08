@@ -1,27 +1,33 @@
 import { Todo } from "../todos/models/todo.model";
 
-const Filters = {
+export const Filters = {
   All: "all",
   Completed: "completed",
   Pending: "pending",
 };
 
 const state = {
-  todos: [
-    new Todo("Piedra del alma"),
-    new Todo("Piedra del infinito"),
-    new Todo("Piedra del tiempo"),
-    new Todo("Piedra del poder"),
-    new Todo("Piedra de la realidad"),
-  ],
+  todos: [],
   filter: Filters.All,
 };
 
 export const initStore = () => {
+  loadStore();
   console.log("InitStore 🥑");
 };
 
-export const loadStore = () => {};
+export const loadStore = () => {
+  if (!localStorage.getItem("todos")) return;
+  const { todos = [], filter = Filters.All } = JSON.parse(
+    localStorage.getItem("todos")
+  );
+  state.todos = todos;
+  state.filter = filter;
+};
+
+const saveStateToLocalStorage = () => {
+  localStorage.setItem("todos", JSON.stringify(state));
+};
 
 export const getTodos = (filter = Filters.All) => {
   switch (filter) {
@@ -43,6 +49,7 @@ export const getTodos = (filter = Filters.All) => {
 export const addTodo = (description) => {
   if (!description) throw new Error("Description is required");
   state.todos.push(new Todo(description));
+  saveStateToLocalStorage();
 };
 
 /**
@@ -54,6 +61,7 @@ export const toggleTodo = (id) => {
     if (item.id === id) item.done = !item.done;
     return item;
   });
+  saveStateToLocalStorage();
 };
 
 /**
@@ -62,14 +70,17 @@ export const toggleTodo = (id) => {
  */
 export const deleteTodo = (id) => {
   state.todos = state.todos.filter((todo) => todo.id !== id);
+  saveStateToLocalStorage();
 };
 
 export const deleteCompleted = () => {
-  state.todos = state.todos.filter((todo) => todo.done);
+  state.todos = state.todos.filter((todo) => !todo.done);
+  saveStateToLocalStorage();
 };
 
 export const filterTodos = (filter = Filters.All) => {
   state.filter = filter;
+  saveStateToLocalStorage();
 };
 
 export const getCurrentFilter = () => {
